@@ -9,7 +9,7 @@ import {
   //handleSubmit
 } from '@mui/material';
 import {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 
 
 export default function TaskForm() {
@@ -22,34 +22,60 @@ export default function TaskForm() {
         correo: "",
       });
       const [loading,setLoading] = useState(false)
+      const [editing, setEditing] = useState(false)
       const navigate = useNavigate()
+      const params = useParams();
 
 
       const handleSubmit = async (e) => {
            e.preventDefault();
-           //console.log(task);
-         setLoading(true) 
-         const res = await fetch('http://localhost:3000/tasks',{
+          // console.log(task);
+          setLoading(true);
+
+        if (editing){
+          const response = await fetch(`http://localhost:3000/tasks/${params.id}`,{
+            method:"PUT",
+            headers:{
+              "Content-Type":"application/json",
+            },
+            body:JSON.stringify(task),
+          });
+            const data = await response.json();
+            console.log(data);
+        } else {
+
+          await fetch('http://localhost:3000/tasks',{
             method: "POST",
             body: JSON.stringify(task),
             headers:{
               "Content-Type" : "application/json"
             }
            });
-         const data = await res.json();
-         console.log(data);
+
+        } 
+
          setLoading(false) 
          navigate('/')  
-
-
           };
 
-       const handleChange = e => {
-           //console.log(e.target.name, e.target.value)
-          setTask({...task,[e.target.name]: e.target.value});
-          
+const handleChange = e => {
+  setTask({...task, [e.target.name]: e.target.value});
           };
-          
+
+const loadTask = async (id) => {
+    const res = await fetch(`http://localhost:3000/tasks/${id}`)
+    const data = await res.json()
+    //console.log(data)
+    setTask({nombre: data.nombre, descripcion: data.descripcion, direccion: data.direccion, contactos: data.contactos, correo:data.correo})
+    setEditing(true)
+  };
+
+useEffect(()=> {
+  if (params.id){
+    loadTask(params.id);
+  }
+},[params.id])          
+            
 
 return (
     <Grid container direction="column" alignItems="center" justifyContent="center">
@@ -59,7 +85,10 @@ return (
             backgroundColor:'#f2f4f6',
             padding: '1rem'
             }}>
-             <Typography variant='3' textAlign='center' color='#0a2a42'>NUEVA ORGANIZACIÓN</Typography>
+             <Typography variant='3' textAlign='center' color='#0a2a42'>
+             {editing ? "EDITAR ORGANIZACIÓN": "CREAR ORGANIZACIÓN"}
+             </Typography>
+              
                <CardContent>
                   <form onSubmit={handleSubmit}>
                    <TextField
@@ -70,6 +99,7 @@ return (
                         margin:'.5rem 0',
                       }}
                       name = "nombre"
+                      value={task.nombre}
                       onChange={handleChange}
                       inputProps={{style: {color:'black'}}}
                       inputLabelProps={{style: {color:'white'}}}
@@ -82,6 +112,7 @@ return (
                         margin:'.5rem 0',
                       }}
                       name = "descripcion"
+                      value={task.descripcion}
                       onChange={handleChange}
                       inputProps={{style: {color:"black"}}}
                       inputLabelProps={{style: {color:"white"}}}
@@ -94,6 +125,7 @@ return (
                         margin:'.5rem 0',
                       }}
                       name = "direccion"
+                      value={task.direccion}
                       onChange={handleChange}
                       inputProps={{style: {color:"black"}}}
                       inputLabelProps={{style: {color:"white"}}}
@@ -106,6 +138,7 @@ return (
                         margin:'.5rem 0'
                       }}
                       name = "contactos"
+                      value={task.contactos}
                       onChange={handleChange}
                       inputProps={{style: {color:"black"}}}
                       inputLabelProps={{style: {color:"white"}}}
@@ -118,6 +151,7 @@ return (
                         margin:'.5rem 0'
                       }}
                       name = "correo"
+                      value={task.correo}
                       onChange={handleChange}
                       inputProps={{style: {color:"black"}}}
                       inputLabelProps={{style: {color:"white"}}}

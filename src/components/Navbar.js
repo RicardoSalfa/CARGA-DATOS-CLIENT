@@ -19,6 +19,18 @@ export default function Natbar() {
               Crear Organización
 
             </Button>
+            <Button variant='contained' color='primary' onClick={( )=> navigate('/users/new')} style={{marginLeft:".5rem"}}>
+              Crear usuarios
+
+            </Button>
+            <Button variant='contained' color='primary' onClick={( )=> navigate('/users')} style={{marginLeft:".5rem"}}>
+              Admin-Usuarios
+
+            </Button>
+            <Button variant='contained' color='primary' onClick={( )=> navigate('/carga')} style={{marginLeft:".5rem"}}>
+              Carga Datos
+
+            </Button>
             </Toolbar>
             
           </Container>  
